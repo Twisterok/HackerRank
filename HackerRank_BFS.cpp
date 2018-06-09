@@ -31,6 +31,45 @@ namespace
     }
 }
 
+vector<int> bfs_onEdges(int n, const vector<std::pair<int, int>>& edges, int start) {
+    std::vector<int> distances(n, -1);
+    std::vector<EColor> mark(n, EColor::White);
+
+    queue<int> vertexQueue;
+
+    vertexQueue.push(start);
+    distances[start] = 0;
+    mark[start] = EColor::Grey;
+
+    while (!vertexQueue.empty())
+    {
+        int vertex = vertexQueue.front();
+        vertexQueue.pop();
+
+        auto templatePair = std::make_pair(vertex, 0);
+        auto lowerBound = std::lower_bound(edges.begin(), edges.end(), templatePair, [](const std::pair<int, int>& lhs,
+            const std::pair<int, int>& rhs) {
+            return lhs.first < rhs.first;
+        });
+        auto uppreBound = std::upper_bound(edges.begin(), edges.end(), templatePair, [](const std::pair<int, int>& lhs,
+            const std::pair<int, int>& rhs) {
+            return lhs.first < rhs.first;
+        });
+
+        for (auto it = lowerBound; it != uppreBound; ++it)
+        {
+            if (mark[it->second] == EColor::White)
+            {
+                distances[it->second] = distances[it->first] + 1;
+                mark[it->second] = EColor::Grey;
+                vertexQueue.push(it->second);
+            }
+        }
+        mark[vertex] = EColor::Black;
+    }
+
+    return distances;
+}
 
 vector<int> bfs(int n, int m, const vector<vector<int>>& edges, int start) {
     std::vector<int> distances(n, -1);
